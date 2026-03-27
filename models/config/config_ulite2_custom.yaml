@@ -1,0 +1,38 @@
+dataset:
+  # root: /home/wicomai/datasets/Panoptic_dataset/semantic
+  root: /home/wicomai/datasets/UAVSegmentationDataset
+  num_workers: 12
+  batch_size: 24
+  image_size:
+  - 512
+  - 512
+  # train_sequences: 70
+  # val_sequences: 20
+  # test_sequences: 20
+trainer:
+  pretrained_path: 
+  epochs: 50
+  optimizer: AdamW
+  loss_fn: DiceLoss
+  # loss_fn: BCEWithLogitsLoss
+  lr: 0.001
+  gpu_id: 3
+  scheduler:
+    type: ReduceLROnPlateau
+    factor: 0.15
+    patience: 10
+    cooldown: 5
+  early_stop:
+    patience: 10
+    min_delta: 0.001
+    mode: min
+  checkpoint:
+    save_dir: weights/ulite
+model:
+  name: U-Lite-custom-2
+  in_channels: 3
+  start_out_channels: 64
+  num_classes: 1
+  num_blocks: 7
+  num_padding: 1
+  is_upsample: True
