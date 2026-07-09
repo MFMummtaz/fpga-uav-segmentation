@@ -36,8 +36,9 @@ class UAVSegmDataset(Dataset):
             image = self.transforms(image)
 
         mask = np.array(mask)
-        mask[mask > 0] = 1 # Collapse 255 down to 1
-        mask = torch.from_numpy(mask).float()
+        mask = (mask > 0).astype(np.float32)
+        # mask = (mask > 0).astype(np.long)
+        mask = torch.from_numpy(mask)
 
         return image, mask
 
@@ -79,6 +80,7 @@ class UAVSegmDataset(Dataset):
 
             # Take 50%
             combined = combined[:len(combined)//2]
+            # combined = combined[:len(combined)//10]
             image_list, mask_list = zip(*combined)
 
         # For semantic dataset

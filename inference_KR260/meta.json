@@ -1,0 +1,13 @@
+{
+    "lib": "libvart-dpu-runner.so",
+    "filename": "semantic_ulite_custom5_kr260.xmodel",
+    "kernel": [
+        "subgraph_Novelty_ULite__Novelty_ULite_Conv2d_conv_out__12002",
+        "subgraph_Novelty_ULite__Novelty_ULite_Conv2d_conv_in__input_3",
+        "subgraph_Novelty_ULite__Novelty_ULite_EncoderBlock_e3__Conv2d_pw__input_105",
+        "subgraph_Novelty_ULite__Novelty_ULite_EncoderBlock_e4__Conv2d_pw__input_139",
+        "subgraph_Novelty_ULite__Novelty_ULite_EncoderBlock_e2__Conv2d_pw__input_71",
+        "subgraph_Novelty_ULite__Novelty_ULite_EncoderBlock_e5__Conv2d_pw__input_173"
+    ],
+    "target": "DPUCZDX8G_ISA1_B4096_0101000016010407"
+}

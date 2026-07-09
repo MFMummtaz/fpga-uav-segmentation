@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-from torchinfo import summary
 
 class AxialDW(nn.Module):
     def __init__(self, dim, mixer_kernel, dilation = 1):
@@ -87,7 +86,7 @@ class ULite(nn.Module):
         self.d3 = DecoderBlock(128, 64)
         self.d2 = DecoderBlock(64, 32)
         self.d1 = DecoderBlock(32, 16)
-        self.conv_out = nn.Conv2d(16, 1, kernel_size=1)
+        self.conv_out = nn.Conv2d(16, 2, kernel_size=1)
 
     def forward(self, x):
         """Encoder"""
@@ -109,8 +108,3 @@ class ULite(nn.Module):
         x = self.d1(x, skip1)
         x = self.conv_out(x)
         return x
-
-if __name__ == '__main__':
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = ULite().to(device)
-    summary(model,(1, 3,512,1024))

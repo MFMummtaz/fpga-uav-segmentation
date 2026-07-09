@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from torchinfo import summary
+# from torchinfo import summary
 
 class DPU_AxialDW(nn.Module):
     def __init__(self, dim, mixer_kernel, dilation=1):
@@ -15,11 +15,15 @@ class DPU_AxialDW(nn.Module):
                 nn.Conv2d(dim, dim, kernel_size=3, padding=1, groups=dim, bias=False),
                 nn.BatchNorm2d(dim),
                 nn.ReLU6(inplace=True),
-                nn.Conv2d(dim, dim, kernel_size=3, padding=1, groups=dim, bias=False)
+                nn.Conv2d(dim, dim, kernel_size=3, padding=1, groups=dim, bias=False),
+                nn.BatchNorm2d(dim) # Add BN here so the last Conv is fused
             )
         else:
-            self.dw = nn.Conv2d(dim, dim, kernel_size=3, padding=dilation, 
-                                groups=dim, dilation=dilation, bias=False)
+            self.dw = nn.Sequential(
+                nn.Conv2d(dim, dim, kernel_size=3, padding=dilation, 
+                          groups=dim, dilation=dilation, bias=False),
+                nn.BatchNorm2d(dim) # Add BN here
+            )
 
     def forward(self, x):
         return x + self.dw(x)
@@ -94,17 +98,18 @@ class EncoderBlock(nn.Module):
     def __init__(self, in_c, out_c):
         super().__init__()
         self.dw = DPU_AxialDW(in_c, mixer_kernel=(7, 7))
-        self.bn = nn.BatchNorm2d(in_c)
+        # self.bn = nn.BatchNorm2d(in_c)
         self.pw = nn.Conv2d(in_c, out_c, kernel_size=1, bias=False) 
+        self.bn_pw = nn.BatchNorm2d(out_c)
         self.down = nn.MaxPool2d((2, 2))
         self.act = nn.ReLU6(inplace=True)
         self.channel_attn = FauxChannelAttention(in_c)
 
     def forward(self, x):
-        feat = self.bn(self.dw(x))
+        feat = self.dw(x)
         attended_feat = self.channel_attn(feat)
         skip = attended_feat
-        x = self.act(self.down(self.pw(attended_feat)))
+        x = self.act(self.down(self.bn_pw(self.pw(attended_feat)))) 
         return x, skip
 
 class DecoderBlock(nn.Module):
@@ -175,4 +180,4 @@ if __name__ == '__main__':
     # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     device = torch.device("cpu")
     model = Novelty_ULite().to(device)
-    summary(model, (1, 3, 512, 1024))
+    # summary(model, (1, 3, 512, 1024))

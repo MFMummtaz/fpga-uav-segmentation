@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from torchvision.transforms.functional import center_crop
-from torchinfo import summary
+# from torchinfo import summary
 import torch.nn.functional as F
 import einops
 
@@ -194,4 +194,4 @@ if __name__ == '__main__':
         padding=1,
     )
     
-    summary(model, input_data=x, col_width=20, depth=5, row_settings=["depth", "var_names"], col_names=["input_size", "kernel_size", "output_size", "params_percent"])
+    # summary(model, input_data=x, col_width=20, depth=5, row_settings=["depth", "var_names"], col_names=["input_size", "kernel_size", "output_size", "params_percent"])

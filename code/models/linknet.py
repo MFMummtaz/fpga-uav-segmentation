@@ -6,7 +6,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torchinfo import summary
+# from torchsummary import summary
 from torchvision.models import resnet
 
 
@@ -239,4 +239,4 @@ class LinkNet(nn.Module):
 if __name__ == '__main__':
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = LinkNet(classes=11).to(device)
-    summary(model,(1, 3, 512, 1024))
+    # summary(model,(3,512,1024))
