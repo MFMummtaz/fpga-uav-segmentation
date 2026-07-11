@@ -1,3 +1,9 @@
+<p align="center">
+  <img src="./images/2.jpg" width="31%" alt="1"/>
+  <img src="./images/5.jpg" width="31%" alt="2"/>
+  <img src="./images/segmentation_result.png" width="31%" alt="3"/>
+</p>
+
 # FPGA-based UAV Image Semantic Segmentation
 
 [![Target Hardware](https://img.shields.io/badge/Hardware-AMD%20Xilinx%20Kria%20KV260%2FKR260-blue.svg)](https://www.xilinx.com/products/som/kria.html)
