@@ -42,7 +42,6 @@ import copy
 import numpy as np
 from tqdm import tqdm
 from collections import OrderedDict
-import yaml
 
 import torch
 import torch.nn as nn
@@ -50,38 +49,25 @@ from torch.utils import data
 import torchvision.transforms as transform
 from torch.nn.parallel.scatter_gather import gather
 import torch.nn.functional as F
-# import segmentation_models_pytorch as smp
 
 import code.utils as utils
 from code.utils.misc import save_checkpoint
 from code.utils.metrics import batch_pix_accuracy, pixel_accuracy, batch_intersection_union
-# from code.utils.lr_scheduler import LR_Scheduler
 from code.utils.metrics import *
-# from code.utils.parallel import DataParallelModel, DataParallelCriterion
-# from code.datasets import get_segmentation_dataset
-# from code.datasets import get_loader
-# from code.datasets.drone import UAVInstanceDataset
-from code.datasets.drone_loader_antiuav_train import UAVSegmDataset
-
-from code.models import fpn  
-from code.models.fpn_custom import FPN
-from code.models.unet_simple import U_Net
-from code.models.ulite import ULite
-from code.models.linknet import LinkNet
-from code.models.fpn_custom_PAPER import FPN
-# from code.models.custom_light_2 import Novelty_ULite
-from code.models.custom_light_3 import Novelty_ULite
-# from code.models.unet_simple_drone import UnetGenerator
-# from code.models.thindyunet import ThinDyUNet
+from code.datasets.drone_loader_antiuav import UAVSegmDataset
 from code.configs.model_config import Options
+
+from code.models.ulite import ULite
+from code.models.fpn_custom import FPN
+from code.models.linknet import LinkNet
+from code.models.thindyunet import ThinDyUNet
+from code.models.custom_model import Novelty_ULite
+
 import logging
 torch_ver = torch.__version__[:3]
 if torch_ver == '0.3':
     from torch.autograd import Variable
 #torch.backends.cudnn.benchmark = True
-
-import logging
-import functools
 
 class Combined2ClassLoss(nn.Module):
     def __init__(self):
@@ -129,6 +115,7 @@ def custom_collate_fn(batch):
 class Trainer():
     def __init__(self, args):
         self.args = args
+
         # data transforms cityscapes
         # input_transform = transform.Compose([
         #     transform.ToTensor(),
@@ -141,59 +128,12 @@ class Trainer():
                                                                  std=[0.23343998, 0.24014007, 0.23295579])
                                             ])
 
-        # dataset
-        # data_kwargs = {'transform': input_transform, 'base_size': args.base_size, 'crop_size': args.crop_size}
-        # trainset = get_segmentation_dataset(args.dataset, split=args.train_split, mode='train', root=args.data_folder, **data_kwargs)
-        # testset = get_segmentation_dataset(args.dataset, split='val', mode ='val', root=args.data_folder, **data_kwargs)
-
-        # TRAIN_IMG="/workspace/dataset/Panoptic_dataset_tarot/Instance_updated/UAV-Image/train/"
-        # TRAIN_MASK="/workspace/dataset/Panoptic_dataset_tarot/Instance_updated/UAV-Mask/train/"
-        # VAL_IMG="/workspace/dataset/Panoptic_dataset_tarot/Instance_updated/UAV-Image/val/"
-        # VAL_MASK="/workspace/dataset/Panoptic_dataset_tarot/Instance_updated/UAV-Mask/val/"
-        
-        # trainset = UAVInstanceDataset(TRAIN_IMG, 
-        #                              TRAIN_MASK, 
-        #                              transforms=input_transform)
-        
-        # testset = UAVInstanceDataset(VAL_IMG, 
-        #                              VAL_MASK, 
-        #                              transforms=input_transform)
-
-        
+        # dataset [CHANGE] !!!
         root_dir="/workspace/dataset/UAVSegmentationDataset/"
         
         trainset = UAVSegmDataset(root_dir, 2, input_transform, "train")
         testset = UAVSegmDataset(root_dir, 2, input_transform, "val")
     
-
-        # cfgg = "/workspace/segmentation_project/pt_SemanticFPN_cityscapes_256_512_10.56G_3.0/code/configs/vistas_config.yml"
-        # with open(cfgg, 'r') as f:
-        #     cfg = yaml.full_load(f)
-
-        # data_loader = get_loader(cfg["data"]["dataset"])
-        # data_path = cfg["data"]["path"]
-
-        # t_loader = data_loader(
-        #     data_path,
-        #     is_transform=True,
-        #     split=cfg["data"]["train_split"],
-        #     img_size=(cfg["data"]["img_rows"], cfg["data"]["img_cols"]),
-        #     augmentations=None,
-        # )
-
-        # v_loader = data_loader(
-        #     data_path,
-        #     is_transform=True,
-        #     split=cfg["data"]["val_split"],
-        #     img_size=(cfg["data"]["img_rows"], cfg["data"]["img_cols"]),
-        # )
-
-        # dataloader
-        # kwargs = {'num_workers': args.workers, 'pin_memory': True} 
-        # self.trainloader = data.DataLoader(trainset, batch_size=24, \
-        #                                    drop_last=True, shuffle=True, **kwargs)
-        # self.valloader = data.DataLoader(testset, batch_size=24, \
-        #                                  drop_last=False, shuffle=False, **kwargs)
         self.trainloader = data.DataLoader(
             trainset, batch_size=18, shuffle=True,
             num_workers=10, collate_fn=custom_collate_fn, drop_last=False, pin_memory=False
@@ -204,39 +144,24 @@ class Trainer():
             num_workers=10, collate_fn=custom_collate_fn, drop_last=False, pin_memory=True
         )
 
-        # self.trainloader = data.DataLoader(
-        #     t_loader,
-        #     batch_size=cfg["training"]["batch_size"],
-        #     num_workers=cfg["training"]["n_workers"],
-        #     shuffle=True,
-        # )
-
-        # self.valloader = data.DataLoader(
-        #     v_loader, batch_size=cfg["training"]["batch_size"], num_workers=cfg["training"]["n_workers"]
-        # )
-
         self.nclass = args.num_classes
         self.best_pred = 0.0 
 
         # model
         if args.model == "unet":
-            # model = U_Net(in_ch=3, out_ch=2)
-            # model = UnetGenerator(in_dim=3, out_dim=2, num_filter=24)
             # model = ULite()
             model = LinkNet(classes=2)
         elif args.model == "fpn":
-            # model = fpn.get_fpn(nclass=args.num_classes, backbone=args.backbone, pretrained=False)
             model = FPN(num_blocks=[2, 4, 8, 4], num_classes=2)
         elif args.model == "custom":
             model = Novelty_ULite(num_classes=2)
-        # elif args.model == "thindyunet":
-        #     model = ThinDyUNet(in_channels=3, 
-        #                        start_out_channels=64, 
-        #                        num_class=2, 
-        #                        size=7, 
-        #                        padding=1, 
-        #                        upsample=True)
-
+        elif args.model == "thindyunet":
+            model = ThinDyUNet(in_channels=3, 
+                               start_out_channels=64, 
+                               num_class=2, 
+                               size=7, 
+                               padding=1, 
+                               upsample=True)
         else:
             print("undefined models")
             exit()
@@ -245,11 +170,8 @@ class Trainer():
 
         # optimizer using different LR
         params_list = list(filter(lambda p: p.requires_grad, model.parameters()))
-        # params_list = [{'params': model.pretrained.parameters(), 'lr': args.lr},]
-        # if hasattr(model, 'head'):
-        #     params_list.append({'params': model.head.parameters(), 'lr': args.lr*10})
-        # optimizer = torch.optim.SGD(params_list, lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay)
         optimizer = torch.optim.Adam(params_list, lr=args.lr, weight_decay=args.weight_decay)
+
         # criterions
         # self.criterion = torch.nn.CrossEntropyLoss(ignore_index=args.ignore_label)
         # self.criterion = torch.nn.CrossEntropyLoss(ignore_index=255)
@@ -275,9 +197,6 @@ class Trainer():
             self.best_pred = checkpoint['best_pred']
             print("=> loaded checkpoint '{}' (epoch {})" \
                   .format(args.weight, checkpoint['epoch']))
-        # clear start epoch if fine-tuning
-        # self.scheduler = LR_Scheduler(args.lr_scheduler, args.lr, \
-        #                                 args.epochs, len(self.trainloader), warmup_epochs=5)
 
         # set up scheduler for decreased the LR by a factor of 0.1 
         # if the validation results didn't improve over 5 consecutive checks.
@@ -290,7 +209,6 @@ class Trainer():
         self.model.train()
         tbar = tqdm(self.trainloader)
         for i, (image, target) in enumerate(tbar):
-            # self.scheduler(self.optimizer, i, epoch, self.best_pred)
             self.optimizer.zero_grad()
             if torch_ver == "0.3":
                 image = Variable(image)
@@ -354,8 +272,6 @@ class Trainer():
         pixAcc = 1.0 * total_correct / (np.spacing(1) + total_label)
         IoU = 1.0 * total_inter / (np.spacing(1) + total_union)
         mIoU = IoU.mean()
-            # tbar.set_description(
-            #     'pixAcc: %.3f, Validation mIoU: %.3f' % (pixAcc, mIoU))
             
         # experiment.log_metric("validation mIoU", mIoU)
         total_loss /= len(self.valloader)
