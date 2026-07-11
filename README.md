@@ -90,7 +90,7 @@ You can directly use their code for your model development and deployment.
 - Then you can use run_quant.sh file perform quantization of your model and convert it into .xmodel. 
 - Then use run_compile.sh for FPGA related hardware deployment for the .xmodel output.
 
-### 🎯 Target Deployment (Kria Board)
+## 🎯 Target Deployment (Kria Board)
 
 1. Transfer Files: Copy the inference_KR260 to your Kria target board via scp or USB storage. (You can change the .xmodel files inside the folder with your new model)
 2. Setup the DPU environment inside of the KR260 FPGA device with OS AMD Linux and activate it. (The FPGA fan should be rotating heavily if its activated). You can follow this link for reference (https://github.com/Xilinx/Kria-PYNQ)
