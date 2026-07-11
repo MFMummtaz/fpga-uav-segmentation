@@ -89,3 +89,9 @@ You can directly use their code for your model development and deployment.
 - Make new model and train it using new dataset by running the run_train.sh file, it will produce .pt weight file. 
 - Then you can use run_quant.sh file perform quantization of your model and convert it into .xmodel. 
 - Then use run_compile.sh for FPGA related hardware deployment for the .xmodel output.
+
+### 🎯 Target Deployment (Kria Board)
+
+1. Transfer Files: Copy the inference_KR260 to your Kria target board via scp or USB storage. (You can change the .xmodel files inside the folder with your new model)
+2. Setup the DPU environment inside of the KR260 FPGA device with OS AMD Linux and activate it. (The FPGA fan should be rotating heavily if its activated). You can follow this link for reference (https://github.com/Xilinx/Kria-PYNQ)
+3. Inference with VART: Run the model using python files called segmentation.py to perform segmentation using 1 frame of drone images.
