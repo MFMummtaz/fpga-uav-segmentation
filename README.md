@@ -106,13 +106,13 @@ Below is a demonstration of the semantic segmentation model running on the Kria 
 ### Inference Sample in GPU RTX3090
 
 <p align="center">
-  <img src="./images/1.png" width="48%" alt="1"/>
-  <img src="./images/2.png" width="48%" alt="2"/>
-  <img src="./images/3.png" width="48%" alt="2"/>
+  <img src="./images/1.jpg" width="48%" alt="1"/>
+  <img src="./images/2.jpg" width="48%" alt="2"/>
+  <img src="./images/3.jpg" width="48%" alt="2"/>
 </p>
 
 ### Inference Sample in KR260 FPGA Development Board
 <p align="center">
-  <img src="./images/4.png" width="48%" alt="1"/>
-  <img src="./images/5.png" width="48%" alt="2"/>
+  <img src="./images/4.jpg" width="48%" alt="1"/>
+  <img src="./images/5.jpg" width="48%" alt="2"/>
 </p>
