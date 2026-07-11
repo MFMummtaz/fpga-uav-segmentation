@@ -98,3 +98,21 @@ You can directly use their code for your model development and deployment.
 1. Transfer Files: Copy the inference_KR260 to your Kria target board via scp or USB storage. (You can change the .xmodel files inside the folder with your new model)
 2. Setup the DPU environment inside of the KR260 FPGA device with OS AMD Linux and activate it. (The FPGA fan should be rotating heavily if its activated). You can follow this link for reference (https://github.com/Xilinx/Kria-PYNQ)
 3. Inference with VART: Run the model using python files called segmentation.py to perform segmentation using 1 frame of drone images.
+
+## 🖼️ Model Performance & Results
+
+Below is a demonstration of the semantic segmentation model running on the Kria KR260 board:
+
+### Inference Sample in GPU RTX3090
+
+<p align="center">
+  <img src="./images/1.png" width="48%" alt="1"/>
+  <img src="./images/2.png" width="48%" alt="2"/>
+  <img src="./images/3.png" width="48%" alt="2"/>
+</p>
+
+### Inference Sample in KR260 FPGA Development Board
+<p align="center">
+  <img src="./images/4.png" width="48%" alt="1"/>
+  <img src="./images/5.png" width="48%" alt="2"/>
+</p>
