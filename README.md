@@ -35,8 +35,6 @@ cd Vitis-AI
 git checkout 3.0
 ```
 
----
-
 ### 2. Verify Docker & Pull Image
 Make sure Docker is installed properly, then pull the pre-built Vitis AI 3.0 PyTorch GPU container image:
 
@@ -65,9 +63,11 @@ After that you can start developing the model using this environment.
 
 For developing process, you can refer to this Model Zoo comparison table from AMD Vitis-AI as reference of their developed model. (https://xilinx.github.io/Vitis-AI/3.0/html/docs/reference/ModelZoo_VAI3.0_Github_web.htm).
 
+---
+
 ## ⚙️ Model Quantization & Compilation Workflow
 
-### 4. Setup the overall code
+### 1. Setup the overall code
 
 Download the full code of SemanticFPN training code from AMD Vitis-AI by go to "/Vitis-AI/model_zoo/model-listpt_SemanticFPN_cityscapes_256_512_10.56G_3.0/" and download the .zip file from the model.yaml file there.
 
@@ -85,10 +85,13 @@ You can directly use their code for your model development and deployment.
 
 ⚠️ Important: Modify the DPU fingerprint value from "fingerprint":"0x101000056010407" to "fingerprint":"0x101000016010407" to match the target DPU IP on the Kria board.
 
+---
+
 ## Happy developing!
 - Make new model and train it using new dataset by running the run_train.sh file, it will produce .pt weight file. 
 - Then you can use run_quant.sh file perform quantization of your model and convert it into .xmodel. 
 - Then use run_compile.sh for FPGA related hardware deployment for the .xmodel output.
+---
 
 ## 🎯 Target Deployment (Kria Board)
 
