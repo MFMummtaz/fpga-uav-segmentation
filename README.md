@@ -19,6 +19,8 @@ This repository provides an end-to-end framework for training, optimizing, and d
 
 By leveraging hardware acceleration by the board, this project achieves low-latency and energy-efficient inference suitable for edge deployment on autonomous drones.
 
+Link - https://kookmin.dcollection.net/srch/srchDetail/200001018748
+
 ---
 
 ## 🧰 Prerequisites & Hardware Setup
